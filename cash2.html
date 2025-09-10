@@ -144,14 +144,14 @@
     }
     
     const guadagno = importo - anticipo;
-    const metaguadagno = guadagno/2;
+    const metaguadagno = guadagno / 2;
     const tasse = metaguadagno * (tassePerc / 100);
     const reinvestimento = metaguadagno * (reinvestPerc / 100);
     const personal = metaguadagno * (personalPerc / 100);
 
-    document.getElementById('risultato').innerHTML = `
+  document.getElementById('risultato').innerHTML = `
   <p>Guadagno totale: € ${guadagno.toFixed(2)}</p>
-  <p>Metà del guadagno (personale): € ${metàGuadagno.toFixed(2)}</p>
+  <p>Metà del guadagno (personale): € ${metaguadagno.toFixed(2)}</p>
   <p>Tasse (${tassePerc}% su metà): € ${tasse.toFixed(2)}</p>
   <p>Reinvestimento (${reinvestPerc}% su metà): € ${reinvestimento.toFixed(2)}</p>
   <p>Personale (${personalPerc}% su metà): € ${personal.toFixed(2)}</p>
