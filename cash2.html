@@ -142,18 +142,21 @@
       if(chart) chart.destroy();
       return;
     }
-
+    
     const guadagno = importo - anticipo;
-    const tasse = guadagno * (tassePerc / 100);
-    const reinvestimento = guadagno * (reinvestPerc / 100);
-    const personal = guadagno * (personalPerc / 100);
+    const metaguadagno = guadagno/2;
+    const tasse = metaguadagno * (tassePerc / 100);
+    const reinvestimento = metaguadagno * (reinvestPerc / 100);
+    const personal = metaguadagno * (personalPerc / 100);
 
     document.getElementById('risultato').innerHTML = `
-      <p>Guadagno : € ${guadagno.toFixed(2)}</p>
-      <p>Tasse (${tassePerc}%) : € ${tasse.toFixed(2)}</p>
-      <p>Reinvestimento (${reinvestPerc}%) : € ${reinvestimento.toFixed(2)}</p>
-      <p>Personal (${personalPerc}%) : € ${personal.toFixed(2)}</p>
-    `;
+  <p>Guadagno totale: € ${guadagno.toFixed(2)}</p>
+  <p>Metà del guadagno (personale): € ${metàGuadagno.toFixed(2)}</p>
+  <p>Tasse (${tassePerc}% su metà): € ${tasse.toFixed(2)}</p>
+  <p>Reinvestimento (${reinvestPerc}% su metà): € ${reinvestimento.toFixed(2)}</p>
+  <p>Personale (${personalPerc}% su metà): € ${personal.toFixed(2)}</p>
+`;
+
 
     const ctx = document.getElementById('grafico').getContext('2d');
     const dati = [tasse, reinvestimento, personal];
