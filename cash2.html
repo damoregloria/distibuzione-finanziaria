@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Distribuzione Finanziaria</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 500px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input {
+      margin: 8px 0;
+      padding: 12px;
+      width: 90%;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1em;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 95%;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .result {
+      margin-top: 20px;
+      text-align: left;
+      font-size: 1em;
+      color: #444;
+    }
+    .result p {
+      margin: 6px 0;
+      padding: 8px;
+      background: #f9f9f9;
+      border-left: 4px solid #3498db;
+      border-radius: 6px;
+    }
+    canvas {
+      margin-top: 20px;
+      width: 100% !important;
+      height: 300px !important;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .percentuali {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .percentuali label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      font-size: 0.9em;
+    }
+    .percentuali input {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="box">
+  <h2>📊 Distribuzione Finanziaria</h2>
+  <input type="number" id="importo" placeholder="Importo totale (€)">
+  <input type="number" id="anticipo" placeholder="Anticipo (€)">
+
+  <div class="percentuali">
+    <label>
+      Tasse (%) 
+      <input type="number" id="tassePerc" value="30">
+    </label>
+    <label>
+      Reinvestimento (%) 
+      <input type="number" id="reinvestPerc" value="10">
+    </label>
+    <label>
+      Personale (%) 
+      <input type="number" id="personalPerc" value="60">
+    </label>
+  </div>
+
+  <button onclick="calcola()">Calcola</button>
+  <div class="result" id="risultato"></div>
+  <canvas id="grafico"></canvas>
+</div>
+
+<script>
+  let chart;
+
+  function calcola() {
+    const importo = parseFloat(document.getElementById('importo').value);
+    const anticipo = parseFloat(document.getElementById('anticipo').value);
+    const tassePerc = parseFloat(document.getElementById('tassePerc').value);
+    const reinvestPerc = parseFloat(document.getElementById('reinvestPerc').value);
+    const personalPerc = parseFloat(document.getElementById('personalPerc').value);
+
+    const totalePerc = tassePerc + reinvestPerc + personalPerc;
+
+    if (isNaN(importo) || isNaN(anticipo) || importo < anticipo) {
+      document.getElementById('risultato').innerHTML = "<p>⚠️ Inserisci valori validi (importo ≥ anticipo)</p>";
+      if(chart) chart.destroy();
+      return;
+    }
+
+    if (totalePerc !== 100) {
+      document.getElementById('risultato').innerHTML = "<p>⚠️ La somma delle percentuali deve essere 100%</p>";
+      if(chart) chart.destroy();
+      return;
+    }
+
+    const guadagno = importo - anticipo;
+    const tasse = guadagno * (tassePerc / 100);
+    const reinvestimento = guadagno * (reinvestPerc / 100);
+    const personal = guadagno * (personalPerc / 100);
+
+    document.getElementById('risultato').innerHTML = `
+      <p>Guadagno : € ${guadagno.toFixed(2)}</p>
+      <p>Tasse (${tassePerc}%) : € ${tasse.toFixed(2)}</p>
+      <p>Reinvestimento (${reinvestPerc}%) : € ${reinvestimento.toFixed(2)}</p>
+      <p>Personal (${personalPerc}%) : € ${personal.toFixed(2)}</p>
+    `;
+
+    const ctx = document.getElementById('grafico').getContext('2d');
+    const dati = [tasse, reinvestimento, personal];
+    const etichette = [`Tasse (${tassePerc}%)`, `Reinvestimento (${reinvestPerc}%)`, `Personal (${personalPerc}%)`];
+
+    if(chart) chart.destroy();
+
+chart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: etichette,
+    datasets: [{
+      data: dati,
+      backgroundColor: ["#AEC6CF", "#FFB6C1", "#CBAACB"],
+      borderColor: ["#AEC6CF", "#FFB6C1", "#CBAACB"],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false }
+      // qui non ci sono datalabels
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: '€' }
+      },
+      x: {
+        title: { display: true, text: 'Categorie' }
+      }
+    }
+  }
+});
+
+  }
+</script>
+</body>
+</html>
+
